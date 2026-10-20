@@ -62,4 +62,22 @@ public class OllamaDescripteurTest {
 
         assertFalse(description.getTexte().isBlank());
     }
+
+    /**
+     * Demande explicitement la date pour observer l'appel de l'outil dans la console.
+     * Nécessite Ollama, le modèle configuré et test.png.
+     * L'appel d'outil est observable dans les logs, mais n'est pas vérifié par cette assertion.
+     *
+     * @throws Exception si le chargement ou la génération échoue
+     */
+    @Test
+    void describesImageWithCurrentDate() throws Exception {
+        Description description = descripteur.decrire(
+            loadImage(),
+            "Appelle l'outil today pour donner la date du jour, puis décris cette image."
+        );
+        System.out.println(description.getTexte());
+
+        assertFalse(description.getTexte().isBlank());
+    }
 }

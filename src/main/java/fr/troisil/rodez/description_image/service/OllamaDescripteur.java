@@ -3,6 +3,9 @@ package fr.troisil.rodez.description_image.service;
 import dev.langchain4j.data.message.ImageContent;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.Result;
+import dev.langchain4j.service.tool.ToolArgumentsErrorHandler;
+import dev.langchain4j.service.tool.ToolExecutionErrorHandler;
 import fr.troisil.rodez.description_image.domain.Description;
 import fr.troisil.rodez.description_image.domain.Image;
 import fr.troisil.rodez.description_image.domain.exceptions.DescriptionImpossibleException;
@@ -10,14 +13,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Produit une audiodescription avec un modèle local Ollama.
+ * Produit une audiodescription avec un modèle local Ollama et des outils Java.
  * Le prompt principal est chargé depuis {@code /audiodescription-prompt.txt}.
  * La demande de l'utilisateur est envoyée séparément, avec l'image PNG.
  */
 public class OllamaDescripteur implements DescripteurImage {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        OllamaDescripteur.class
+    );
     private static final String BASE_URL = "http://localhost:11434";
     private static final String MODEL_NAME = "gemma4:e2b";
     private static final Duration REQUEST_TIMEOUT = Duration.ofMinutes(2);
@@ -58,11 +66,18 @@ public class OllamaDescripteur implements DescripteurImage {
                     "Fournis une audiodescription générale de cette image.";
             }
 
-            String answer = assistant.describe(
+            Result<String> result = assistant.describe(
                 secondaryPrompt,
                 ImageContent.from(image.getBase64EncodedImage(), "image/png")
             );
-
+            for (var execution : result.toolExecutions()) {
+                LOGGER.info(
+                    "[Outil] {} → {}",
+                    execution.request().name(),
+                    execution.result()
+                );
+            }
+            String answer = result.content();
             if (answer == null || answer.isBlank()) {
                 throw new IllegalStateException(
                     "Ollama a renvoyé une réponse vide."
@@ -97,7 +112,7 @@ public class OllamaDescripteur implements DescripteurImage {
     }
 
     /**
-     * Configure le modèle et le prompt principal.
+     * Configure le modèle, le prompt principal et l'exécution des outils.
      *
      * @param mainPrompt les instructions communes aux descriptions
      * @return l'assistant configuré, sans mémoire partagée entre les appels
@@ -112,7 +127,13 @@ public class OllamaDescripteur implements DescripteurImage {
         return AiServices.builder(AudiodescriptionAssistant.class)
             .chatModel(model)
             .systemMessageProvider(memoryId -> mainPrompt)
-
+            .tools(new DateTools())
+            .toolArgumentsErrorHandler(
+                ToolArgumentsErrorHandler.sendExceptionMessageToLlm()
+            )
+            .toolExecutionErrorHandler(
+                ToolExecutionErrorHandler.failInvocationUnlessVisibleToLlm()
+            )
             .build();
     }
 
