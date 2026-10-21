@@ -2,7 +2,9 @@ package fr.troisil.rodez.description_image.service;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import dev.langchain4j.agent.tool.Tool;
 import fr.troisil.rodez.description_image.domain.Description;
 import fr.troisil.rodez.description_image.domain.Image;
 import fr.troisil.rodez.description_image.domain.exceptions.DescriptionImpossibleException;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -40,13 +43,14 @@ public class OllamaDescripteurTest {
     }
 
     /**
-     * Charge uniquement le fichier de test {@code test.png}, situé à la racine du projet.
+     * Charge une image de test située à la racine du projet.
      *
+     * @param filename le nom du fichier image
      * @return l'image encodée en Base64
      * @throws IOException si le fichier ne peut pas être lu
      */
-    private Image loadImage() throws IOException {
-        byte[] bytes = Files.readAllBytes(Path.of("test.png"));
+    private Image loadImage(String filename) throws IOException {
+        byte[] bytes = Files.readAllBytes(Path.of(filename));
         return new Image(Base64.getEncoder().encodeToString(bytes));
     }
 
@@ -57,7 +61,10 @@ public class OllamaDescripteurTest {
      */
     @Test
     void describesImage() throws Exception {
-        Description description = descripteur.decrire(loadImage(), null);
+        Description description = descripteur.decrire(
+            loadImage("test.png"),
+            null
+        );
         System.out.println(description.getTexte());
 
         assertFalse(description.getTexte().isBlank());
@@ -73,11 +80,63 @@ public class OllamaDescripteurTest {
     @Test
     void describesImageWithCurrentDate() throws Exception {
         Description description = descripteur.decrire(
-            loadImage(),
+            loadImage("test.png"),
             "Appelle l'outil today pour donner la date du jour, puis décris cette image."
         );
         System.out.println(description.getTexte());
 
         assertFalse(description.getTexte().isBlank());
+    }
+
+    /**
+     * Vérifie la lecture de la date sur le cacao et l'appel réel de l'outil de date.
+     * Nécessite Ollama, le modèle configuré et test-peremption.png.
+     * Le résultat dépend de la reconnaissance de l'image et du comportement du modèle.
+     *
+     * @throws Exception si le chargement ou la génération échoue
+     */
+    @Test
+    void readsProductDateAndCallsDateTool() throws Exception {
+        RecordingDateTools dateTools = new RecordingDateTools();
+        OllamaDescripteur descriptor = new OllamaDescripteur(dateTools);
+
+        Description description = descriptor.decrire(
+            loadImage("test-peremption.png"),
+            "Quelle date est imprimée sur la boîte de cacao au premier plan ? " +
+                "Indique si elle est déjà passée par rapport à aujourd'hui."
+        );
+        System.out.println(description.getTexte());
+
+        assertTrue(dateTools.called, "Le modèle doit appeler l'outil today.");
+        List<String> acceptedDates = List.of(
+            "2022-05-11",
+            "11 mai 2022",
+            "11.05.2022",
+            "11/05/2022"
+        );
+        boolean correctDate = acceptedDates
+            .stream()
+            .anyMatch(description.getTexte()::contains);
+        assertTrue(
+            correctDate,
+            "La réponse doit mentionner le 11 mai 2022 : " +
+                description.getTexte()
+        );
+    }
+
+    /** Outil réel instrumenté uniquement pour vérifier son exécution dans ce test. */
+    public static class RecordingDateTools extends DateTools {
+
+        private boolean called;
+
+        @Override
+        @Tool(
+            "Retourne la date actuelle à Paris au format yyyy-MM-dd. " +
+                "À utiliser avant de comparer une date de péremption à aujourd'hui."
+        )
+        public String today() {
+            called = true;
+            return super.today();
+        }
     }
 }

@@ -39,8 +39,19 @@ public class OllamaDescripteur implements DescripteurImage {
      * @throws DescriptionImpossibleException si le prompt ou la configuration est invalide
      */
     public OllamaDescripteur() throws DescriptionImpossibleException {
+        this(new DateTools());
+    }
+
+    /**
+     * Configure le descripteur avec un outil fourni, notamment pour observer ses appels en test.
+     *
+     * @param dateTools l'outil de date à enregistrer
+     * @throws DescriptionImpossibleException si l'initialisation échoue
+     */
+    OllamaDescripteur(DateTools dateTools)
+        throws DescriptionImpossibleException {
         try {
-            assistant = createAssistant(loadMainPrompt());
+            assistant = createAssistant(loadMainPrompt(), dateTools);
         } catch (IOException | RuntimeException e) {
             throw new DescriptionImpossibleException(
                 "Impossible d'initialiser le descripteur Ollama.",
@@ -115,9 +126,13 @@ public class OllamaDescripteur implements DescripteurImage {
      * Configure le modèle, le prompt principal et l'exécution des outils.
      *
      * @param mainPrompt les instructions communes aux descriptions
+     * @param dateTools l'outil de date disponible pour le modèle
      * @return l'assistant configuré, sans mémoire partagée entre les appels
      */
-    private AudiodescriptionAssistant createAssistant(String mainPrompt) {
+    private AudiodescriptionAssistant createAssistant(
+        String mainPrompt,
+        DateTools dateTools
+    ) {
         OllamaChatModel model = OllamaChatModel.builder()
             .baseUrl(BASE_URL)
             .modelName(MODEL_NAME)
@@ -127,7 +142,7 @@ public class OllamaDescripteur implements DescripteurImage {
         return AiServices.builder(AudiodescriptionAssistant.class)
             .chatModel(model)
             .systemMessageProvider(memoryId -> mainPrompt)
-            .tools(new DateTools())
+            .tools(dateTools)
             .toolArgumentsErrorHandler(
                 ToolArgumentsErrorHandler.sendExceptionMessageToLlm()
             )
