@@ -19,6 +19,7 @@ public class DescriptionControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    /** Description avec question & image valide */
     @Test
     void testDescribeWithValidImage() throws Exception {
         MockMultipartFile imageFile = new MockMultipartFile(
@@ -37,6 +38,7 @@ public class DescriptionControllerTest {
         .andExpect(content().contentType("application/json"));
     }
 
+    /** Description sans question & image valide */
     @Test
     void testDescribeWithNoQuestion() throws Exception {
         MockMultipartFile imageFile = new MockMultipartFile(
@@ -53,6 +55,7 @@ public class DescriptionControllerTest {
         .andExpect(status().isOk());
     }
 
+    /** Description avec question et sans image */
     @Test
     void testDescribeWithNoFile() throws Exception {
         mockMvc.perform(
@@ -62,6 +65,7 @@ public class DescriptionControllerTest {
         .andExpect(status().isBadRequest());
     }
 
+    /** Description avec question avec image invalide (mauvais type) */
     @Test
     void testDescribeWithInvalidFileType() throws Exception {
         MockMultipartFile textFile = new MockMultipartFile(
