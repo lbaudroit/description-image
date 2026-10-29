@@ -12,7 +12,7 @@ public interface DescripteurImage {
      * Décrit le contenu d'une image en français, en quelques phrases,
      * ou répond à la question posée sur cette image.
      *
-     * @param image l'image PNG encodée en Base64, obligatoire et non vide
+     * @param image l'image encodée en Base64, obligatoire et non vide
      * @param question la demande complémentaire, ou {@code null} ou une chaîne
      *                 blanche pour une audiodescription générale
      * @return la description ou la réponse, jamais vide
