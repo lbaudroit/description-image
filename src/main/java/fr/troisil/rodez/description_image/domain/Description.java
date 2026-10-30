@@ -5,13 +5,14 @@ package fr.troisil.rodez.description_image.domain;
  */
 public class Description {
 
-    String texte;
+    private String texte;
 
     public Description(String texte) {
         this.texte = texte;
     }
 
-    public String getTexte() {
-        return texte;
+
+    public String getText() {
+        return this.texte;
     }
 }
