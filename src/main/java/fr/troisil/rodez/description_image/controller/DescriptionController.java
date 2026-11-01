@@ -25,13 +25,16 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api")
 public class DescriptionController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DescriptionController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+        DescriptionController.class
+    );
 
     private final DescripteurImage descripteurImage;
 
-    public static final String SUPPORTED_MEDIA_TYPES_STRING = Image.SUPPORTED_MIME_TYPES.stream()
-        .map(t -> t.split("/")[1].toUpperCase())
-        .collect(Collectors.joining(", "));
+    public static final String SUPPORTED_MEDIA_TYPES_STRING =
+        Image.SUPPORTED_MIME_TYPES.stream()
+            .map(t -> t.split("/")[1].toUpperCase())
+            .collect(Collectors.joining(", "));
 
     public DescriptionController(DescripteurImage descripteurImage) {
         this.descripteurImage = descripteurImage;
@@ -44,20 +47,35 @@ public class DescriptionController {
      * @return une description de l'image envoyée
      */
     @PostMapping("/describe")
-    public ResponseEntity<Object> describe(@RequestParam(required = false) String question, @RequestParam MultipartFile fichier) {
+    public ResponseEntity<Object> describe(
+        @RequestParam(required = false) String question,
+        @RequestParam MultipartFile fichier
+    ) {
         if (fichier.isEmpty()) {
             return ResponseEntity.badRequest().body("Le fichier est vide.");
         }
         if (fichier.getContentType() == null) {
-            return ResponseEntity.badRequest().body("Aucun type de fichier défini. Types supportés : " + SUPPORTED_MEDIA_TYPES_STRING);
+            return ResponseEntity.badRequest().body(
+                "Aucun type de fichier défini. Types supportés : " +
+                    SUPPORTED_MEDIA_TYPES_STRING
+            );
         }
 
         MediaType mediaType = extractMediaType(fichier);
         if (mediaType == null) {
-            return ResponseEntity.badRequest().body("Type de fichier malformé.");
+            return ResponseEntity.badRequest().body(
+                "Type de fichier malformé."
+            );
         }
-        if (Image.SUPPORTED_MIME_TYPES.stream().noneMatch(supportedType -> supportedType.equals(mediaType.toString()))) {
-            return ResponseEntity.badRequest().body("Type de fichier non supporté. Types supportés : " + SUPPORTED_MEDIA_TYPES_STRING);
+        if (
+            Image.SUPPORTED_MIME_TYPES.stream().noneMatch(supportedType ->
+                supportedType.equals(mediaType.toString())
+            )
+        ) {
+            return ResponseEntity.badRequest().body(
+                "Type de fichier non supporté. Types supportés : " +
+                    SUPPORTED_MEDIA_TYPES_STRING
+            );
         }
 
         try {
@@ -65,14 +83,24 @@ public class DescriptionController {
             if (bytes.length == 0) {
                 return ResponseEntity.badRequest().body("Le fichier est vide.");
             }
-            Image image = new Image(Base64.getEncoder().encodeToString(bytes), mediaType.toString());
+            Image image = new Image(
+                Base64.getEncoder().encodeToString(bytes),
+                mediaType.toString()
+            );
             return ResponseEntity.ok(descripteurImage.decrire(image, question));
         } catch (IOException | IllegalArgumentException e) {
             LOGGER.error("Échec de lecture du fichier envoyé.", e);
-            return ResponseEntity.internalServerError().body("Impossible de lire le fichier.");
+            return ResponseEntity.internalServerError().body(
+                "Impossible de lire le fichier."
+            );
         } catch (DescriptionImpossibleException e) {
-            LOGGER.error("Échec de génération de la description par le fournisseur.", e);
-            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Impossible de générer une description.");
+            LOGGER.error(
+                "Échec de génération de la description par le fournisseur.",
+                e
+            );
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(
+                "Impossible de générer une description."
+            );
         }
     }
 
@@ -84,7 +112,9 @@ public class DescriptionController {
      */
     private MediaType extractMediaType(MultipartFile fichier) {
         try {
-            MediaType parsedType = MediaType.parseMediaType(fichier.getContentType());
+            MediaType parsedType = MediaType.parseMediaType(
+                fichier.getContentType()
+            );
             return new MediaType(parsedType.getType(), parsedType.getSubtype());
         } catch (InvalidMediaTypeException e) {
             return null;

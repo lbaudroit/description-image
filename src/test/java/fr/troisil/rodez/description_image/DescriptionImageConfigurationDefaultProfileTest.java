@@ -24,7 +24,10 @@ class DescriptionImageConfigurationDefaultProfileTest {
 
     @Test
     void descripteurImageBeanIsNotNull() {
-        assertNotNull(descripteurImage, "Le bean descripteurImage ne doit pas être null");
+        assertNotNull(
+            descripteurImage,
+            "Le bean descripteurImage ne doit pas être null"
+        );
     }
 
     @Test

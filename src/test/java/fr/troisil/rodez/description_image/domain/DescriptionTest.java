@@ -12,6 +12,8 @@ class DescriptionTest {
     @NullAndEmptySource
     @ValueSource(strings = { " ", "\t\n" })
     void rejectsMissingOrBlankDescription(String text) {
-        assertThrows(IllegalArgumentException.class, () -> new Description(text));
+        assertThrows(IllegalArgumentException.class, () ->
+            new Description(text)
+        );
     }
 }

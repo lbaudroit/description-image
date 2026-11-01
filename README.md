@@ -13,14 +13,17 @@ Application web d'audiodescription pour personnes aveugles ou malvoyantes. Séle
 Cloner ou télécharger le projet, puis se placer à la racine (dossier contenant `pom.xml`).
 
 ### Avec la fausse implémentation (sans modèle)
+
 **Fonctionne de bout en bout (page + synthèse vocale) sans modèle installé.**
 
 Par défaut (sans profil) :
+
 ```sh
 ./mvnw spring-boot:run
 ```
 
 Ou avec profil explicite :
+
 ```sh
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=faux
 ```
@@ -49,4 +52,5 @@ Ouvrir [http://localhost:8080](http://localhost:8080).
 ## Modèle attendu
 
 - **Modèle** : `gemma4:e2b` (modèle de vision multilingue)
+- **Serveur** : Ollama local sur `http://localhost:11434`
 - **Serveur** : Ollama local sur `http://localhost:11434`

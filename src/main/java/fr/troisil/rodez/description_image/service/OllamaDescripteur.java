@@ -107,8 +107,6 @@ public class OllamaDescripteur implements DescripteurImage {
         return new Description(result.content());
     }
 
-
-
     /**
      * Configure le modèle, le prompt principal et l'exécution des outils.
      *

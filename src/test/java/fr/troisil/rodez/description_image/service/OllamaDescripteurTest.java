@@ -4,20 +4,18 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import dev.langchain4j.agent.tool.Tool;
+import fr.troisil.rodez.description_image.domain.Description;
+import fr.troisil.rodez.description_image.domain.Image;
+import fr.troisil.rodez.description_image.domain.exceptions.DescriptionImpossibleException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-
-import dev.langchain4j.agent.tool.Tool;
-import fr.troisil.rodez.description_image.domain.Description;
-import fr.troisil.rodez.description_image.domain.Image;
-import fr.troisil.rodez.description_image.domain.exceptions.DescriptionImpossibleException;
 
 class OllamaDescripteurTest {
 
@@ -51,7 +49,10 @@ class OllamaDescripteurTest {
      */
     private Image loadImage(String filename) throws IOException {
         byte[] bytes = Files.readAllBytes(Path.of(filename));
-        return new Image(Base64.getEncoder().encodeToString(bytes), MediaType.IMAGE_PNG_VALUE);
+        return new Image(
+            Base64.getEncoder().encodeToString(bytes),
+            MediaType.IMAGE_PNG_VALUE
+        );
     }
 
     /**

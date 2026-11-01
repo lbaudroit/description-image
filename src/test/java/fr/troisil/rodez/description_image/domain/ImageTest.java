@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class ImageTest {
 
     @ParameterizedTest
-    @ValueSource(strings = {"image/png", "image/jpeg", "image/gif"})
+    @ValueSource(strings = { "image/png", "image/jpeg", "image/gif" })
     void preservesContentAndMimeType(String mimeType) {
         Image image = new Image("aW1hZ2U=", mimeType);
 
@@ -20,7 +20,7 @@ class ImageTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {" ", "\t\n"})
+    @ValueSource(strings = { " ", "\t\n" })
     void rejectsMissingOrBlankContent(String content) {
         assertThrows(IllegalArgumentException.class, () ->
             new Image(content, "image/png")
@@ -29,7 +29,7 @@ class ImageTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {" ", "text/plain", "image/webp", "image/*"})
+    @ValueSource(strings = { " ", "text/plain", "image/webp", "image/*" })
     void rejectsMissingOrUnsupportedMimeType(String mimeType) {
         assertThrows(IllegalArgumentException.class, () ->
             new Image("aW1hZ2U=", mimeType)
