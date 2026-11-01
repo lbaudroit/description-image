@@ -16,9 +16,28 @@
 
             <form id="description-form">
                 <label for="image">Votre image</label>
-                <input id="image" name="fichier" type="file" accept="image/png,image/jpeg,image/gif" aria-describedby="file-help" required />
-                <p id="file-help" class="hint">PNG, JPEG ou GIF · 10 mégaoctets maximum</p>
-                <button type="submit">Décrire l'image</button>
+                <input
+                    id="image"
+                    name="fichier"
+                    type="file"
+                    accept="image/png,image/jpeg,image/gif"
+                    aria-describedby="file-help"
+                    required
+                />
+                <p id="file-help" class="hint">
+                    PNG, JPEG ou GIF. 10 Mo maximum
+                </p>
+                <label for="question">Votre question (facultative)</label>
+                <textarea
+                    id="question"
+                    name="question"
+                    rows="3"
+                    aria-describedby="question-help"
+                ></textarea>
+                <p id="question-help" class="hint">
+                    Laissez ce champ vide pour obtenir une description générale.
+                </p>
+                <button type="submit">Décrire l’image</button>
             </form>
 
             <p id="status" class="status" role="status"></p>

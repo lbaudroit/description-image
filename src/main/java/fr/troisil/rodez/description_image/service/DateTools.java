@@ -14,8 +14,10 @@ public class DateTools {
      *
      * @return la date au format ISO {@code yyyy-MM-dd}
      */
-    @Tool("Retourne la date actuelle à Paris au format yyyy-MM-dd. "
-        + "À utiliser avant de comparer une date de péremption à aujourd'hui.")
+    @Tool(
+        "Retourne la date actuelle à Paris au format yyyy-MM-dd. " +
+            "À utiliser avant de comparer une date de péremption à aujourd'hui."
+    )
     public String today() {
         return LocalDate.now(ZoneId.of("Europe/Paris")).toString();
     }
