@@ -36,7 +36,7 @@ public class DescriptionControllerTest {
                     .param("question", "What is in this image?")
             )
             .andExpect(status().isOk())
-            .andExpect(content().contentType("application/json"));
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     /** Description sans question & image valide */
