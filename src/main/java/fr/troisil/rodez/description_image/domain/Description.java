@@ -11,8 +11,7 @@ public class Description {
         this.texte = texte;
     }
 
-
-    public String getText() {
+    public String getTexte() {
         return this.texte;
     }
 }
