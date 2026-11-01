@@ -15,11 +15,9 @@ import java.util.Base64;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
-/**
- * Vérifie les entrées et la génération d'une audiodescription.
- */
-public class OllamaDescripteurTest {
+class OllamaDescripteurTest {
 
     private OllamaDescripteur descripteur;
 
@@ -30,15 +28,15 @@ public class OllamaDescripteurTest {
 
     @Test
     void rejectsMissingImage() {
-        assertThrows(DescriptionImpossibleException.class, () ->
+        assertThrows(IllegalArgumentException.class, () ->
             descripteur.decrire(null, "Décris cette image.")
         );
     }
 
     @Test
     void rejectsEmptyImage() {
-        assertThrows(DescriptionImpossibleException.class, () ->
-            descripteur.decrire(new Image(""), null)
+        assertThrows(IllegalArgumentException.class, () ->
+            descripteur.decrire(new Image("", MediaType.IMAGE_PNG_VALUE), null)
         );
     }
 
@@ -51,7 +49,10 @@ public class OllamaDescripteurTest {
      */
     private Image loadImage(String filename) throws IOException {
         byte[] bytes = Files.readAllBytes(Path.of(filename));
-        return new Image(Base64.getEncoder().encodeToString(bytes));
+        return new Image(
+            Base64.getEncoder().encodeToString(bytes),
+            MediaType.IMAGE_PNG_VALUE
+        );
     }
 
     /**

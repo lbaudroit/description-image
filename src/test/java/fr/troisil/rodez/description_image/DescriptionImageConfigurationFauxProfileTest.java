@@ -15,8 +15,8 @@ import org.springframework.test.context.ActiveProfiles;
  * Vérifie que le bean descripteurImage est correctement configuré avec le profile 'dev'.
  */
 @SpringBootTest
-@ActiveProfiles("test")
-class DescriptionImageConfigurationTestProfileTest {
+@ActiveProfiles("faux")
+class DescriptionImageConfigurationFauxProfileTest {
 
     @Autowired
     @Qualifier("descripteurImage")
@@ -24,7 +24,10 @@ class DescriptionImageConfigurationTestProfileTest {
 
     @Test
     void descripteurImageBeanIsNotNull() {
-        assertNotNull(descripteurImage, "Le bean descripteurImage ne doit pas être null");
+        assertNotNull(
+            descripteurImage,
+            "Le bean descripteurImage ne doit pas être null"
+        );
     }
 
     @Test
@@ -32,7 +35,7 @@ class DescriptionImageConfigurationTestProfileTest {
         assertInstanceOf(
             FauxDescripteur.class,
             descripteurImage,
-            "Avec le profile 'test', le bean descripteurImage doit être une instance de FauxDescripteur"
+            "Avec le profile 'faux', le bean descripteurImage doit être une instance de FauxDescripteur"
         );
     }
 }

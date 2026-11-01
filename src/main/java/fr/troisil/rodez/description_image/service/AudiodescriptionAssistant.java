@@ -8,7 +8,6 @@ import dev.langchain4j.service.UserMessage;
  * Interface implémentée par LangChain4j pour gérer les échanges et les appels d'outils.
  */
 public interface AudiodescriptionAssistant {
-
     /**
      * Analyse une image, en utilisant les outils disponibles si nécessaire.
      *
@@ -16,5 +15,8 @@ public interface AudiodescriptionAssistant {
      * @param image l'image à analyser
      * @return le texte final et les informations sur les outils exécutés
      */
-    Result<String> describe(@UserMessage String question, @UserMessage ImageContent image);
+    Result<String> describe(
+        @UserMessage String question,
+        @UserMessage ImageContent image
+    );
 }
