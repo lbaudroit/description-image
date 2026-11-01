@@ -1,34 +1,37 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Description d’image</title>
-    <link rel="stylesheet" href="/style.css">
-    <script src="/app.js" defer></script>
-</head>
-<body>
-    <main class="card">
-        <header>
-            <p class="eyebrow">DESCRIPTION D’IMAGE</>
-            <p class="intro">Choisissez une image pour en obtenir une description.</p>
-        </header>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Description d'image</title>
+        <link rel="stylesheet" href="/style.css" />
+        <script src="/app.js" defer></script>
+    </head>
+    <body>
+        <main class="card">
+            <header>
+                <p class="eyebrow">DESCRIPTION D'IMAGE</p>
+                <p class="intro">Choisissez une image pour en obtenir une description.</p>
+            </header>
 
-        <form id="description-form">
-            <label for="image">Votre image</label>
-            <input id="image" name="fichier" type="file"
-                   accept="image/png,image/jpeg,image/gif"
-                   aria-describedby="file-help" required>
-            <p id="file-help" class="hint">PNG, JPEG ou GIF · 10 Mo maximum</p>
-            <button type="submit">Décrire l’image</button>
-        </form>
+            <form id="description-form">
+                <label for="image">Votre image</label>
+                <input id="image" name="fichier" type="file" accept="image/png,image/jpeg,image/gif" aria-describedby="file-help" required />
+                <p id="file-help" class="hint">PNG, JPEG ou GIF · 10 mégaoctets maximum</p>
+                <button type="submit">Décrire l'image</button>
+            </form>
 
-        <p id="status" class="status" role="status"></p>
+            <p id="status" class="status" role="status"></p>
 
-        <section class="description" aria-labelledby="description-title" aria-busy="false">
-            <h2 id="description-title">Description</h2>
-            <p id="result" class="placeholder">La description de votre image apparaîtra ici.</p>
-        </section>
-    </main>
-</body>
+            <section class="description" aria-labelledby="description-title" aria-busy="false">
+                <h2 id="description-title">Description</h2>
+                <p id="result" class="placeholder" aria-live="polite">
+                    La description de votre image apparaîtra ici.
+                </p>
+                <button id="speech-button" type="button">
+                    Lancer ou arrêter la lecture à voix haute
+                </button>
+            </section>
+        </main>
+    </body>
 </html>
