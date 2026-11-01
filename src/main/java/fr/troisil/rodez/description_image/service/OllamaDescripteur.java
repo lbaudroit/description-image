@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Produit une audiodescription avec un modèle local Ollama et des outils Java.
  * Le prompt principal est chargé depuis {@code /audiodescription-prompt.txt}.
- * La demande de l'utilisateur est envoyée séparément, avec l'image PNG.
+ * La demande de l'utilisateur est envoyée séparément, avec le type réel de l'image.
  */
 public class OllamaDescripteur implements DescripteurImage {
 
@@ -36,9 +36,8 @@ public class OllamaDescripteur implements DescripteurImage {
      * Charge le prompt et configure l'assistant réutilisé pour les descriptions.
      * La construction ne lance aucune requête vers Ollama.
      *
-     * @throws DescriptionImpossibleException si le prompt ou la configuration est invalide
      */
-    public OllamaDescripteur() throws DescriptionImpossibleException {
+    public OllamaDescripteur() {
         this(new DateTools());
     }
 
@@ -46,14 +45,12 @@ public class OllamaDescripteur implements DescripteurImage {
      * Configure le descripteur avec un outil fourni, notamment pour observer ses appels en test.
      *
      * @param dateTools l'outil de date à enregistrer
-     * @throws DescriptionImpossibleException si l'initialisation échoue
      */
-    OllamaDescripteur(DateTools dateTools)
-        throws DescriptionImpossibleException {
+    OllamaDescripteur(DateTools dateTools) {
         try {
             assistant = createAssistant(loadMainPrompt(), dateTools);
-        } catch (IOException | RuntimeException e) {
-            throw new DescriptionImpossibleException(
+        } catch (RuntimeException e) {
+            throw new IllegalStateException(
                 "Impossible d'initialiser le descripteur Ollama.",
                 e
             );
@@ -69,58 +66,48 @@ public class OllamaDescripteur implements DescripteurImage {
     @Override
     public Description decrire(Image image, String question)
         throws DescriptionImpossibleException {
+        if (image == null) {
+            throw new IllegalArgumentException("Une image est obligatoire.");
+        }
+        String secondaryPrompt = question;
+        if (secondaryPrompt == null || secondaryPrompt.isBlank()) {
+            secondaryPrompt =
+                "Fournis une audiodescription générale de cette image.";
+        }
+        ImageContent imageContent = ImageContent.from(
+            image.getBase64EncodedImage(),
+            image.getMimeType()
+        );
+
+        Result<String> result;
         try {
-            validateImage(image);
-            String secondaryPrompt = question;
-            if (secondaryPrompt == null || secondaryPrompt.isBlank()) {
-                secondaryPrompt =
-                    "Fournis une audiodescription générale de cette image.";
-            }
-
-            Result<String> result = assistant.describe(
-                secondaryPrompt,
-                ImageContent.from(image.getBase64EncodedImage(), "image/png")
-            );
-            for (var execution : result.toolExecutions()) {
-                LOGGER.info(
-                    "[Outil] {} → {}",
-                    execution.request().name(),
-                    execution.result()
-                );
-            }
-            String answer = result.content();
-            if (answer == null || answer.isBlank()) {
-                throw new IllegalStateException(
-                    "Ollama a renvoyé une réponse vide."
-                );
-            }
-
-            return new Description(answer);
+            result = assistant.describe(secondaryPrompt, imageContent);
         } catch (RuntimeException e) {
             throw new DescriptionImpossibleException(
                 "Impossible de générer la description avec Ollama.",
                 e
             );
         }
-    }
-
-    /**
-     * Vérifie la présence des données de l'image, sans décoder ni charger de fichier.
-     *
-     * @param image l'image à vérifier
-     * @throws IllegalArgumentException si l'image est absente ou vide
-     */
-    private void validateImage(Image image) {
-        if (image == null) {
-            throw new IllegalArgumentException("Une image est obligatoire.");
-        }
-        String base64 = image.getBase64EncodedImage();
-        if (base64 == null || base64.isBlank()) {
-            throw new IllegalArgumentException(
-                "L'image ne peut pas être vide."
+        if (
+            result == null ||
+            result.content() == null ||
+            result.content().isBlank()
+        ) {
+            throw new DescriptionImpossibleException(
+                "Ollama a renvoyé une réponse vide."
             );
         }
+        for (var execution : result.toolExecutions()) {
+            LOGGER.info(
+                "[Outil] {} → {}",
+                execution.request().name(),
+                execution.result()
+            );
+        }
+        return new Description(result.content());
     }
+
+
 
     /**
      * Configure le modèle, le prompt principal et l'exécution des outils.
@@ -156,13 +143,14 @@ public class OllamaDescripteur implements DescripteurImage {
      * Charge les instructions principales depuis les ressources de l'application.
      *
      * @return le prompt principal en UTF-8
-     * @throws IOException si le fichier est absent, illisible ou vide
+     * @throws IllegalStateException si la ressource de l'application est absente,
+     *         illisible ou vide
      */
-    private String loadMainPrompt() throws IOException {
+    private String loadMainPrompt() {
         String resource = "/audiodescription-prompt.txt";
         try (InputStream stream = getClass().getResourceAsStream(resource)) {
             if (stream == null) {
-                throw new IOException(
+                throw new IllegalStateException(
                     "Le fichier audiodescription-prompt.txt est introuvable."
                 );
             }
@@ -171,9 +159,16 @@ public class OllamaDescripteur implements DescripteurImage {
                 StandardCharsets.UTF_8
             );
             if (prompt.isBlank()) {
-                throw new IOException("Le prompt principal est vide.");
+                throw new IllegalStateException(
+                    "Le prompt principal est vide."
+                );
             }
             return prompt;
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                "Impossible de lire le prompt de l'application.",
+                e
+            );
         }
     }
 }

@@ -67,7 +67,7 @@ public class DescriptionController {
             }
             Image image = new Image(Base64.getEncoder().encodeToString(bytes), mediaType.toString());
             return ResponseEntity.ok(descripteurImage.decrire(image, question));
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
             LOGGER.error("Échec de lecture du fichier envoyé.", e);
             return ResponseEntity.internalServerError().body("Impossible de lire le fichier.");
         } catch (DescriptionImpossibleException e) {
