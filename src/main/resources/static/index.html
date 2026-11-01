@@ -3,17 +3,15 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Description d’image</title>
+        <title>Description d'image</title>
         <link rel="stylesheet" href="/style.css" />
         <script src="/app.js" defer></script>
     </head>
     <body>
         <main class="card">
             <header>
-                <h1 class="eyebrow">DESCRIPTION D’IMAGE</h1>
-                <p class="intro">
-                    Choisissez une image pour en obtenir une description.
-                </p>
+                <p class="eyebrow">DESCRIPTION D'IMAGE</p>
+                <p class="intro">Choisissez une image pour en obtenir une description.</p>
             </header>
 
             <form id="description-form">
@@ -27,7 +25,7 @@
                     required
                 />
                 <p id="file-help" class="hint">
-                    PNG, JPEG ou GIF · 10 Mo maximum
+                    PNG, JPEG ou GIF. 10 Mo maximum
                 </p>
                 <label for="question">Votre question (facultative)</label>
                 <textarea
@@ -44,15 +42,14 @@
 
             <p id="status" class="status" role="status"></p>
 
-            <section
-                class="description"
-                aria-labelledby="description-title"
-                aria-busy="false"
-            >
+            <section class="description" aria-labelledby="description-title" aria-busy="false">
                 <h2 id="description-title">Description</h2>
-                <p id="result" class="placeholder">
+                <p id="result" class="placeholder" aria-live="polite">
                     La description de votre image apparaîtra ici.
                 </p>
+                <button id="speech-button" type="button">
+                    Lancer ou arrêter la lecture à voix haute
+                </button>
             </section>
         </main>
     </body>
