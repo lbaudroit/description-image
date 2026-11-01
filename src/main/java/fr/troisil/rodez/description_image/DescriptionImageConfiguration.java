@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class DescriptionImageConfiguration {
 
-    @Profile({"default", "test"})
+    @Profile({"default", "faux"})
     @Bean("descripteurImage")
     public DescripteurImage descripteurFactice() {
         return new FauxDescripteur();
