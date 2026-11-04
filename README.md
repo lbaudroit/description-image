@@ -44,10 +44,6 @@ Ouvrir [http://localhost:8080](http://localhost:8080).
    ```sh
    ./mvnw spring-boot:run -Dspring-boot.run.profiles=ollama
    ```
-   Ou via propriété :
-   ```sh
-   ./mvnw spring-boot:run -Dspring.profiles.active=ollama
-   ```
 
 ## Modèle attendu
 
