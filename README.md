@@ -49,4 +49,3 @@ Ouvrir [http://localhost:8080](http://localhost:8080).
 
 - **Modèle** : `gemma4:e2b` (modèle de vision multilingue)
 - **Serveur** : Ollama local sur `http://localhost:11434`
-- **Serveur** : Ollama local sur `http://localhost:11434`
